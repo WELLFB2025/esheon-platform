@@ -34,7 +34,7 @@ one broker-neutral interface; durable PostgreSQL records; later, an API and a mo
 ## Setup
 
 ```bash
-git clone https://github.com/drick2025/esheon.git ~/work/esheon
+git clone https://github.com/WellFb2025/esheon-platform.git ~/work/esheon
 cd ~/work/esheon
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/pytest -q
