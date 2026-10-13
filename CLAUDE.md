@@ -20,8 +20,8 @@ Full roadmap: docs/IMPLEMENTATION_PLAN.md. Live design: docs/LIVE_TRADING.md. Cu
 13. Ask first before: destructive operations, architecture changes, strategy or risk changes, account-topology changes, data migrations, new dependencies.
 
 ## Known facts to respect (verify before relying on them)
-- Each trading bot has its own Alpaca paper account, order prefix (ESHEL-ZDTE-, ESHEL-SDAY-, ESHEL-SSCP-), state and launchd label. Do not merge accounts without approval.
-- $500 accounts allow 3 day trades per 5 business days (PDT). Central risk must budget this per account.
+- TARGET (owner decision, docs/DECISIONS.md): all bots share ONE account. TODAY: bots still have separate accounts (audit found 0DTE and ICT may already share one). Don't change any bot's account or keys until the Milestone 6 migration plan is approved; the owner migrates.
+- Under $25,000 equity, the whole shared account gets 3 day trades per 5 business days (PDT). Central risk counts and allocates them across bots.
 - Fractional stock orders are DAY-only, so Bot 1 positions are unprotected overnight.
 - Bars are 2-min IEX; Alpaca option bars are only served once 15+ minutes old.
 - Research periods: P1 dev 2024-09-16..2025-09-15, P0 held-out 2024-02-05..09-13 (already used once), P3 2025-09-15..2026-03-31, P2 2026-04-01..09-30.
