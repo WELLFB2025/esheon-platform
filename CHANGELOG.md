@@ -10,6 +10,7 @@
 - `.claude/settings.json`: deny rules for the arm file, kill file, live mode and live keys; asks before editing safety.py.
 - docs/LIVE_TRADING.md (gate, owner commands, promotion criteria); Milestone 2 prompt closes the 0DTE accidental-live path; new Milestone 8 prompt.
 - 33 new tests (56 total).
+- `.claude/settings.json`: pre-approves tests, `rg`, `git add/commit/fetch/push origin`; denies force-push and branch deletion on push; asks before hard reset, rebase, branch -D.
 
 ## 0.0.1 — 2026-10-12 — Milestone 0: repo foundation
 

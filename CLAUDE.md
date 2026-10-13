@@ -36,7 +36,8 @@ Full roadmap: docs/IMPLEMENTATION_PLAN.md. Live design: docs/LIVE_TRADING.md. Cu
 ## How to work (low credit)
 - Start with `pwd`, `git status --short --branch`, a shallow listing. Use `rg` and targeted reads; never dump large files, logs or trees.
 - Don't re-read files you already read this session.
-- One milestone per session. At the end: run relevant tests, show `git diff --stat`, update docs, write a short report, stop.
+- One milestone per session. At the end: run relevant tests, show `git diff --stat`, update docs, commit, push, write a short report, stop.
+- Pre-approved (no prompt): Esheon and bot-repo test commands, `rg`, `git add/commit/fetch`, `git push origin <branch>`. Run git from inside the repo (`cd ~/work/<repo> && git …`), not `git -C`, so the rules match. Never force-push.
 - Report each bot/strategy as: existing, reused, partial, shadow-only, or not started.
 - Keep docs short; update instead of duplicating. Create a doc only when its milestone needs it.
 
