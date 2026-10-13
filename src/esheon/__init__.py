@@ -1,3 +1,3 @@
-"""Esheon: paper-trading-only multi-strategy backend."""
+"""Esheon: multi-strategy trading backend (paper by default, gated live)."""
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"

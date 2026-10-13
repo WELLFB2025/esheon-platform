@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "esheon"
-version = "0.0.1"
-description = "Paper-trading-only multi-strategy trading backend"
+version = "0.1.0"
+description = "Multi-strategy trading backend: paper by default, gated live"
 requires-python = ">=3.11"
 dependencies = []
 

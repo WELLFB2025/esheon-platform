@@ -36,13 +36,23 @@ Then stop. Report in <= 25 lines: verified findings, commands + results, top ris
 owner decisions needed, and the smallest next step. Do not start Milestone 2.
 ```
 
-## Milestone 2 — stabilize
+## Milestone 2 — stabilize + close the accidental live path
 
 ```text
-Milestone 2: stabilize existing code. Read docs/IMPLEMENTATION_PLAN.md first.
-Fix only the defects I approved: <list>. Add the missing pin test for optbot/cog.py
-and optbot/macd_first_engine.py against ~/work/zdte-live. Keep golden tests unchanged.
-Run both suites. Stop and report: diff --stat, test counts, anything triaged.
+Milestone 2: stabilize existing code. Read docs/IMPLEMENTATION_PLAN.md,
+docs/ARCHITECTURE_AUDIT.md and docs/LIVE_TRADING.md first.
+1. zdte-live: replace "ALPACA_PAPER=false means live" with the Esheon gate rules:
+   paper unless ESHEON_MODE=live AND ALPACA_PAPER=false AND every other gate
+   condition holds; conflicting or missing config refuses to start. Leave live OFF.
+   Add tests proving ALPACA_PAPER=false alone refuses. Do not change strategy logic.
+2. Make the shared daily-loss limit fail CLOSED (block new entries) on errors. Test it.
+3. Add the missing pin tests for optbot/cog.py and optbot/macd_first_engine.py
+   against ~/work/zdte-live.
+4. Mark the network-calling and deployed-layout tests so the dev suites pass offline.
+5. Fix only other defects I approved: <list>. Keep golden tests unchanged.
+6. Correct CLAUDE.md lines the audit disproved.
+Run all suites. Hand me the exact deploy command for zdte-live; do not deploy.
+Stop and report: diff --stat, test counts, anything triaged.
 ```
 
 ## Milestone 3 — interfaces, central risk, order manager
@@ -95,4 +105,18 @@ Milestone 7. Add health checks, structured logs, alerts (reuse notify.py), a glo
 stop-new-entries switch, backups and docs/OPERATIONS.md. Run failure tests: broker
 down, DB down, stale data, central-risk down. Produce a readiness report listing what
 is verified and every known limitation. No live trading. Stop and report.
+```
+
+## Milestone 8 — live trading (only after Milestones 3–7 are done)
+
+```text
+Milestone 8. Read docs/LIVE_TRADING.md. Wire the Alpaca adapter to take endpoint and
+key NAMES only from esheon.safety.resolve_trading_mode(); never read key values into
+logs. Enforce TradingContext.limits in central risk (order notional, daily loss, open
+positions) and count PDT day trades per live account. Record live fills as LIVE_FILL
+in separate tables/files from paper; reconcile live state on every start.
+Tests with a fake broker: every gate condition missing refuses; kill switch blocks new
+orders mid-session; arm expiry at midnight ET stops new entries; limits are hard stops.
+Do NOT create the arm file, set ESHEON_MODE=live, add bots to ESHEON_LIVE_BOTS or touch
+live keys. Write the owner's go-live checklist for ONE bot at minimum size. Stop and report.
 ```

@@ -45,6 +45,7 @@ class PriceLabel(str, Enum):
     QUOTE_ACTUAL = "QUOTE_ACTUAL"
     BAR_PROXY = "BAR_PROXY"
     PAPER_FILL = "PAPER_FILL"
+    LIVE_FILL = "LIVE_FILL"
 
 
 class StrategyStatus(str, Enum):
@@ -157,8 +158,8 @@ class Fill:
 
     def __post_init__(self) -> None:
         _require_utc(self.ts, "Fill.ts")
-        if self.label is not PriceLabel.PAPER_FILL:
-            raise ValueError("a Fill must be a PAPER_FILL; quotes and bar proxies are not fills")
+        if self.label not in (PriceLabel.PAPER_FILL, PriceLabel.LIVE_FILL):
+            raise ValueError("a Fill must be PAPER_FILL or LIVE_FILL; quotes and bar proxies are not fills")
 
 
 @dataclass(frozen=True)

@@ -1,20 +1,21 @@
 # Esheon — project rules for Claude Code
 
-Esheon is a paper-trading-only, multi-strategy backend built from the EshelBot bots.
-Full roadmap: docs/IMPLEMENTATION_PLAN.md. Current milestone: see "Status" at the bottom.
+Esheon is a multi-strategy trading backend built from the EshelBot bots. **Paper by default; live only through the gate.**
+Full roadmap: docs/IMPLEMENTATION_PLAN.md. Live design: docs/LIVE_TRADING.md. Current milestone: see "Status" at the bottom.
 
 ## Hard safety rules (never break these)
-1. Paper trading only. Never add, enable or suggest a live-trading path. Broker clients use paper=True; stock bots require ALPACA_PAPER=true.
-2. Never open, print, log or commit `.env` files, API keys, secrets or account numbers. Check that a key is present without showing its value. Alpaca FEE descriptions contain the account number: redact it.
+1. Paper is the default. Every broker client gets its mode, endpoint and key names from `esheon.safety.resolve_trading_mode()` and nowhere else. Never add another path to live (no `paper=False`, no hard-coded live URL, no "ALPACA_PAPER=false means live"). Missing or conflicting config must refuse, never fall through to live.
+1a. Claude Code never turns live on: never create or edit the arm file (`~/.esheon/live_arm`), never set `ESHEON_MODE=live`, never add a bot to `ESHEON_LIVE_BOTS`, never raise the hard ceilings in `safety.py` or remove the kill switch without explicit owner approval in the session. The owner arms live trading by hand.
+2. Never open, print, log or commit `.env` files, API keys (paper or live), secrets or account numbers. Check that a key is present without showing its value. Alpaca FEE descriptions contain the account number: redact it.
 3. Never read, edit or run commands that touch `~/alpaca_trading_bots/**`. Never run `launchctl` or any `deploy/*.sh` script. The owner deploys; hand over the exact command instead.
 4. Work only in the dev repos: `~/work/esheon`, `~/work/zdte-live`, `~/work/stock-bots`, `~/work/zdte-arch`.
 5. Never edit a verbatim copy (`stockbot/macd_first_engine.py`, `stockbot/macd_first_signal_adapter.py`, `optbot/stop_replay.py`, `optbot/cog.py`, `optbot/macd_first_engine.py`). Change the live module in zdte-live first, then re-copy. Esheon imports these; it never forks them.
 6. Preserve existing strategy behavior. Golden tests (`tests/fixtures/golden.json`) are regenerated only for an approved, intended change, and the commit says so.
-7. New or changed strategy rules ship as shadow/log-only with an off switch. Promotion needs owner approval.
+7. New or changed strategy rules ship as shadow/log-only with an off switch. Promotion to paper trading needs owner approval; promotion to live needs the criteria in docs/LIVE_TRADING.md plus written owner sign-off.
 8. If account state, order state, market data, the database or central risk is unavailable or stale: block new entries. Existing positions are still monitored.
 9. Every order goes Strategy -> Bot Risk -> Central Risk + atomic reservation -> Order Manager -> Broker Adapter. Nothing bypasses central risk.
 10. The zone signal logger (Bot 3) never places orders. Its AST no-order test and ReadOnlyTrading wrapper must stay.
-11. Label every price `QUOTE_ACTUAL`, `BAR_PROXY` or `PAPER_FILL`. Never call replayed prices fills. P&L is gross; report fees separately.
+11. Label every price `QUOTE_ACTUAL`, `BAR_PROXY`, `PAPER_FILL` or `LIVE_FILL`. Never call replayed prices fills, and never mix paper and live P&L. P&L is gross; report fees separately.
 12. Never fabricate data, test results, performance or readiness. Never say a test passed unless you ran it; report the command and exact result.
 13. Ask first before: destructive operations, architecture changes, strategy or risk changes, account-topology changes, data migrations, new dependencies.
 
@@ -40,7 +41,7 @@ Full roadmap: docs/IMPLEMENTATION_PLAN.md. Current milestone: see "Status" at th
 - Keep docs short; update instead of duplicating. Create a doc only when its milestone needs it.
 
 ## Repo layout
-- `src/esheon/safety.py` — paper-mode guard + redaction. Every broker client must go through `require_paper_mode()`.
+- `src/esheon/safety.py` — trading-mode gate (`resolve_trading_mode`), paper-only check for log-only components (`require_paper_mode`), kill switch, redaction.
 - `src/esheon/models.py`, `interfaces.py`, `ids.py` — broker-neutral core (draft until the audit confirms it).
 - `docs/MILESTONE_PROMPTS.md` — the prompt for each milestone. `docs/reference/` — source docs, read only the section you need.
 - Esheon tests: `.venv/bin/pytest -q` (no network, no keys).

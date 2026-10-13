@@ -6,13 +6,19 @@
       "Read(//**/.env.*)",
       "Read(~/alpaca_trading_bots/**)",
       "Edit(~/alpaca_trading_bots/**)",
+      "Edit(~/.esheon/**)",
       "Bash(*alpaca_trading_bots*)",
+      "Bash(*live_arm*)",
+      "Bash(*.esheon/KILL*)",
+      "Bash(*ESHEON_MODE=live*)",
+      "Bash(*ALPACA_LIVE_*)",
       "Bash(launchctl *)",
       "Bash(sh *deploy*)",
       "Bash(bash *deploy*)",
       "Bash(*/deploy/*.sh*)"
     ],
     "ask": [
+      "Edit(/src/esheon/safety.py)",
       "Bash(git push *)",
       "Bash(pip install *)",
       "Bash(npm install *)"

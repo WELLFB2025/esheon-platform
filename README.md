@@ -1,8 +1,8 @@
 # Esheon
 
-Paper-trading-only, multi-strategy trading backend, built in gated milestones from the existing EshelBot bots.
+Multi-strategy trading backend, built in gated milestones from the existing EshelBot bots. Paper by default; live only through one gate.
 
-> **Paper only.** Esheon refuses to run unless `ALPACA_PAPER=true`. There is no live-trading path, and none may be added.
+> **Paper by default.** Live trading needs every condition in [docs/LIVE_TRADING.md](docs/LIVE_TRADING.md): explicit live mode, separate live keys, an allow-listed bot, hard limits, a daily owner arm, and no kill switch. Anything less refuses.
 
 ## Status
 
@@ -23,8 +23,8 @@ one broker-neutral interface; durable PostgreSQL records; later, an API and a mo
 | Path | Contents |
 |---|---|
 | `CLAUDE.md` | Standing rules Claude Code loads every session |
-| `.claude/settings.json` | Permission deny rules (no `.env`, no live bot folders, no `launchctl`, no deploy scripts) |
-| `src/esheon/safety.py` | Paper-mode guard and secret redaction |
+| `.claude/settings.json` | Permission deny rules (no `.env`, no live bot folders, no arming live, no `launchctl`, no deploy scripts) |
+| `src/esheon/safety.py` | Trading-mode gate (paper default, gated live), kill switch, secret redaction |
 | `src/esheon/models.py` | Broker-neutral orders, fills, positions, price labels |
 | `src/esheon/interfaces.py` | Draft Strategy / BotRisk / Broker protocols (revised after the audit) |
 | `src/esheon/ids.py` | Unique, attributable client order IDs |
