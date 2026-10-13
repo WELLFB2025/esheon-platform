@@ -37,7 +37,7 @@ class BotRisk(Protocol):
 
 @runtime_checkable
 class Broker(Protocol):
-    """Paper-only broker adapter. Implementations must call safety.require_paper_mode()."""
+    """Broker adapter. Implementations take endpoint and key names only from safety.resolve_trading_mode()."""
 
     def get_account(self) -> AccountSnapshot: ...
 

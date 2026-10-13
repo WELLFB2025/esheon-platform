@@ -52,9 +52,10 @@ def test_intent_rejects_bad_input(kw):
         intent(**kw)
 
 
-def test_fill_must_be_paper_fill():
+def test_fill_must_be_a_real_fill():
     kw = dict(client_order_id="x", symbol="SPY", side=Side.BUY, qty=Decimal(1), price=Decimal("500"), ts=T0)
-    assert Fill(**kw).label is PriceLabel.PAPER_FILL
+    assert Fill(**kw).label is PriceLabel.PAPER_FILL  # default
+    assert Fill(**kw, label=PriceLabel.LIVE_FILL).label is PriceLabel.LIVE_FILL
     for label in (PriceLabel.QUOTE_ACTUAL, PriceLabel.BAR_PROXY):
         with pytest.raises(ValueError):
             Fill(**kw, label=label)
