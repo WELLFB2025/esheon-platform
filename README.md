@@ -6,7 +6,7 @@ Multi-strategy trading backend, built in gated milestones from the existing Eshe
 
 ## Status
 
-Milestone 0 (repo foundation) is done. Milestone 1 (audit of the existing EshelBot repos) is next.
+Milestones 0 (foundation) and 1 (audit) are done. Milestone 2 (stabilize, close 0DTE's accidental live path) is next.
 See [docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md).
 
 ## Target architecture
@@ -40,7 +40,7 @@ python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
 .venv/bin/pytest -q
 ```
 
-Then start Claude Code in `~/work/esheon` and paste the Milestone 1 prompt from `docs/MILESTONE_PROMPTS.md`.
+Then start Claude Code in `~/work/esheon`, switch to auto mode, and paste the next milestone's prompt from `docs/MILESTONE_PROMPTS.md`.
 
 Also copy the deny rules from `.claude/settings.json` into `~/.claude/settings.json`, so they apply
 when Claude Code works in `zdte-live`, `stock-bots` and `zdte-arch` too.

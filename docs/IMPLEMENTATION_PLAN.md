@@ -1,6 +1,6 @@
 # Implementation plan
 
-Status: **Milestone 1 (audit) done, awaiting owner review** — see [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md).
+Status: **Milestone 1 (audit) done. Next: Milestone 2.** Audit: [ARCHITECTURE_AUDIT.md](ARCHITECTURE_AUDIT.md). Decisions: [DECISIONS.md](DECISIONS.md). Live design: [LIVE_TRADING.md](LIVE_TRADING.md).
 Milestones 2–7 re-sized from the audit (2026-10-13). Weeks assume the same pace as before; adjust once owner hours are known.
 
 Source documents: [reference/MASTER_PROMPT.md](reference/MASTER_PROMPT.md) (target),
@@ -12,20 +12,21 @@ Source documents: [reference/MASTER_PROMPT.md](reference/MASTER_PROMPT.md) (targ
 |---|-----------|--------|------|
 | 0 | Repo foundation: CLAUDE.md, safety settings, paper-mode guard, broker-neutral models, CI | Done | Tests pass in CI |
 | 1 | Audit and baseline of zdte-live, stock-bots, zdte-arch | Done (2026-10-13) | ARCHITECTURE_AUDIT.md + owner review |
-| 2 | Stabilize: pin tests for `optbot/cog.py` + `optbot/macd_first_engine.py`; mark 2 network tests and 6 deployed-layout tests so the dev suite is green offline; resolve the stale lock-floor test with the owner; record baseline fingerprint | Weeks 2–3 (smaller) | 0DTE + stock-bots green offline; no strategy change |
-| 3 | Interfaces (revise models per audit §8) + central risk with atomic reservations, **per-account PDT budget**, fail-closed; order manager; Esheon broker wrapper that refuses non-paper for 0DTE too | Weeks 4–7 (larger) | No order bypasses central risk; shared-account PDT test |
+| 2 | Stabilize: replace 0DTE's `ALPACA_PAPER=false` live path with the Esheon gate (left off); make the shared loss governor fail closed; pin tests for `optbot/cog.py` + `optbot/macd_first_engine.py`; mark 2 network tests and 6 deployed-layout tests so the dev suite is green offline; resolve the stale lock-floor test with the owner; record baseline fingerprint | Weeks 2–3 (smaller) | 0DTE + stock-bots green offline; no strategy change |
+| 3 | Interfaces (revise models per audit §8) + central risk with atomic reservations, **per-account PDT budget**, fail-closed; order manager; every broker client takes its mode from `resolve_trading_mode()` | Weeks 4–7 (larger) | No order bypasses central risk; shared-account PDT test |
 | 4 | Strategies: wrap MACD+EMA (0DTE + Bots 1/2 adapters); promote nothing; spec Trend/VWAP from shadow `C_vwap_cog`; then spec the others one at a time | Weeks 8–11 | Each spec pre-registered and approved |
 | 5 | Alpaca paper adapter + PostgreSQL records + reconciliation recognising all `ESHEL-*` and `ESHEON-` prefixes | Weeks 11–14 | No duplicate on ambiguous submit |
 | 6 | Portfolio backtest + shared-account test on a dedicated paper account (0DTE+ICT already share one — model it first) | Weeks 14–18 | Owner approves any topology change |
 | 7 | Operational hardening (fail-closed governor, staleness blocks) + readiness report | Weeks 18–21 | Critical failures block entries |
-| — | API and mobile app | After 7 | Separate planning session |
+| 8 | Live trading: wire the gate into the adapter, enforce live limits + PDT in central risk, LIVE_FILL records, live reconciliation, go-live checklist for ONE bot at minimum size | After 7 | Promotion criteria in LIVE_TRADING.md + owner sign-off |
+| — | API and mobile app | After 8 | Separate planning session |
 
 Timeline is an estimate. Safety gates are never skipped to meet a date.
 
 ## Known gaps between target and current system
 
 1. **PDT limit.** $500 paper accounts get 3 day trades per 5 business days. Only stock Bots 1/2 check it (`pdt_guard`); 0DTE and the Bot 3 trader do not. Central risk must budget PDT per account.
-2. **Account topology.** Stock Bots 1/2 and the Bot 3 trader each have their own account (deploy scripts refuse a shared key). **zero_dte_bot and ict_liquidity_bot already share one account** (code comments), with a fail-open shared loss governor.
+2. **Account topology.** Target (owner decision): ONE shared account for all bots. Today: Stock Bots 1/2 and the Bot 3 trader each have their own account (deploy scripts refuse a shared key). **zero_dte_bot and ict_liquidity_bot already share one account** (code comments), with a fail-open shared loss governor.
 3. **Five strategies vs one.** Only MACD-first + EMA 9/21 exists (in three bots). Trend/VWAP has a shadow fragment; the rest are not started.
 4. **Two risk stacks.** 0DTE `RiskEngine` + `OrderManager` vs stock-bots `risk.can_enter` → `_size_and_gate` → `portfolio.check`. Wrap both; don't rewrite.
 5. **Persistence.** CSV ledgers + JSON state today; Postgres is new and lives here first.
@@ -51,13 +52,13 @@ Research to date shows no strategy with an edge after realistic costs. Esheon is
 
 - [x] Repo: Esheon is its own repo (this one).
 - [ ] Do the three MACD+EMA bots count as one strategy or three of the five?
-- [ ] Accounts/PDT: keep separate accounts, or fund one shared paper account above the PDT threshold?
+- [x] Accounts: ONE shared account for all bots (2026-10-13). Still open: fund it at or above $25,000 to lift the PDT limit?
 - [ ] Is `ict_liquidity_bot` still running, who owns it, may Claude Code read it?
 - [ ] Self-learner: fix its defects or switch it off?
 - [ ] Run the pending Bot 1/2/3 and variant-D deploys before the audit?
 - [ ] Database: local PostgreSQL, Docker, or hosted?
 - [ ] Hours per week available.
-- [ ] 0DTE allows `ALPACA_PAPER=false` (live endpoint). Approve making it refuse, like the stock bots? (change in zdte-live, needs deploy)
+- [x] Live trading: paper by default, live only through the gate (2026-10-13). 0DTE's `ALPACA_PAPER=false` path is replaced by the gate in Milestone 2 (owner deploys).
 - [ ] Bot 3 trader `sd_cog_options_bot`: keep paper-trading a failed rule? CLAUDE.md rule 10 should name logger vs trader.
 - [ ] Lock-floor test expects per-position $15 (1.315), code gives per-contract (1.39). Which is intended?
 - [ ] Which repo does `deploy_fixes_345.sh` deploy from: zdte-live or zdte-arch?

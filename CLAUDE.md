@@ -14,7 +14,7 @@ Full roadmap: docs/IMPLEMENTATION_PLAN.md. Live design: docs/LIVE_TRADING.md. Cu
 7. New or changed strategy rules ship as shadow/log-only with an off switch. Promotion to paper trading needs owner approval; promotion to live needs the criteria in docs/LIVE_TRADING.md plus written owner sign-off.
 8. If account state, order state, market data, the database or central risk is unavailable or stale: block new entries. Existing positions are still monitored.
 9. Every order goes Strategy -> Bot Risk -> Central Risk + atomic reservation -> Order Manager -> Broker Adapter. Nothing bypasses central risk.
-10. The zone signal logger (Bot 3) never places orders. Its AST no-order test and ReadOnlyTrading wrapper must stay.
+10. The zone signal logger (Bot 3, `optbot/`) never places orders. (The separate `sdbot/` paper trader is a different program; it is not covered by this guarantee.) Its AST no-order test and ReadOnlyTrading wrapper must stay.
 11. Label every price `QUOTE_ACTUAL`, `BAR_PROXY`, `PAPER_FILL` or `LIVE_FILL`. Never call replayed prices fills, and never mix paper and live P&L. P&L is gross; report fees separately.
 12. Never fabricate data, test results, performance or readiness. Never say a test passed unless you ran it; report the command and exact result.
 13. Ask first before: destructive operations, architecture changes, strategy or risk changes, account-topology changes, data migrations, new dependencies.
@@ -29,7 +29,7 @@ Full roadmap: docs/IMPLEMENTATION_PLAN.md. Live design: docs/LIVE_TRADING.md. Cu
 ## Commands
 - Tests (0DTE or stock-bots, from repo root):
   `ALPACA_API_KEY=T ALPACA_SECRET_KEY=T ~/work/zdte-arch/.venv/bin/python -m pytest -q -p no:cacheprovider tests`
-  Dummy keys only satisfy imports; no test calls Alpaca.
+  Dummy keys only satisfy imports. Audit: 2 zdte-live tests DO call Alpaca's data API (401 with dummy keys) and 6 expect the deployed layout; Milestone 2 marks them so the dev suite runs offline.
 - Live-code fingerprint (proves production untouched):
   `~/work/zdte-arch/research/shadow_audit/prod_fingerprint.py OUT.json [COMPARE.json]`
 
@@ -49,5 +49,6 @@ Full roadmap: docs/IMPLEMENTATION_PLAN.md. Live design: docs/LIVE_TRADING.md. Cu
 
 ## Status
 - Milestone 0 (repo foundation): done
-- Current milestone: 1 (audit and baseline) — prompt in docs/MILESTONE_PROMPTS.md
-- Open owner decisions: see docs/IMPLEMENTATION_PLAN.md
+- Milestone 1 (audit): done — docs/ARCHITECTURE_AUDIT.md
+- Current milestone: 2 (stabilize + close 0DTE's accidental live path) — prompt in docs/MILESTONE_PROMPTS.md
+- Decisions made: docs/DECISIONS.md. Open owner decisions: docs/IMPLEMENTATION_PLAN.md
